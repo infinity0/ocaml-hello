@@ -1,0 +1,29 @@
+OASISFormat:    0.4
+OCamlVersion:   >= 4.02.3
+Name:           hello
+Version:        0.1
+Maintainers:    Ximin Luo <infinity0@pwned.gg>
+Homepage:       https://github.com/infinity0/ocaml-hello
+Synopsis:       Hello World, or OCaml packaging examples.
+Authors:        Ximin Luo <infinity0@pwned.gg>
+License:        CC0
+Plugins:        META (0.4), DevFiles (0.4)
+BuildTools:     ocamlbuild
+AlphaFeatures:  ocamlbuild_more_args
+Description:
+  Example code for using different OCaml packaging tools.
+
+Library hello
+  Path: src
+  Modules: Hello
+
+Executable hello
+  Path: src
+  Install: true
+  MainIs: main.ml
+  CompiledObject: native
+# we don't need this for "hello"; just an example on how to do things
+# core needs -thread otherwise ocamlfind gives an error
+  BuildDepends: core, hello
+  ByteOpt: -thread
+  NativeOpt: -thread

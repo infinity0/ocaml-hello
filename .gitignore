@@ -1,0 +1,10 @@
+# autogen.sh
+/Makefile
+/configure
+/setup.*
+/opam/
+
+# Makefile
+/_build/
+/*.byte
+/*.native
