@@ -1,8 +1,9 @@
-# autogen.sh
-/Makefile
+# autogen
 /configure
+/Makefile
 /setup.*
 /opam/
+/.merlin
 
 # Makefile
 /_build/
