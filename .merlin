@@ -1,3 +1,7 @@
-B _build/src
-S src
-PKG cmdliner js_of_ocaml
+# TODO: not ideal, see https://github.com/the-lambda-church/merlin/issues/469
+CMT /home/*/.opam/4.02.3/build/**/_build
+B _build/src/**
+B _build/test/**
+S src/**
+S test/**
+PKG oUnit

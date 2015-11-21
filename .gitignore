@@ -6,5 +6,6 @@
 
 # Makefile
 /_build/
+/*.docdir
 /*.byte
 /*.native
