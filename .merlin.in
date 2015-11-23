@@ -1,4 +1,4 @@
-CMT %{prefix}%/build/**/_build
+CMT %{prefix}%/build/**/_build/**
 PKG oUnit
 
 S src/**
