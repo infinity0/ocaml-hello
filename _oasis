@@ -55,5 +55,5 @@ Document hello_api
   Title: API reference for HelloWorld
   XOCamlbuildPath: .
   XOCamlbuildExtraArgs:
-    "-docflags '-colorize-code -short-functors -charset utf-8'"
+    "-docflags '-colorize-code -short-functors -charset utf-8 -stars'"
   XOCamlbuildLibraries: hello
