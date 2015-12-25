@@ -1,5 +1,3 @@
 CMT %{prefix}%/build/**/_build/**
-PKG oUnit
-
 S src/**
 S test/**
