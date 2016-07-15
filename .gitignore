@@ -4,6 +4,8 @@
 /setup.*
 /opam/
 /.merlin
+/*.install
+/_oasis_remove_.ml
 
 # Makefile
 /_build/
