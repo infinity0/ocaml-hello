@@ -1,12 +1,17 @@
 #!/usr/bin/make -f
-# Generate developer files.
-# Requires oasis and oasis2opam.
+# Generate developer files. Requires opam and others.
 
 OPAM = opam
 OASIS = oasis
 OASIS2OPAM = oasis2opam
 
+check_prog = type $(1) >/dev/null || { echo >&2 "not found: $(1); $(2)"; false; }
+
 all: setup.data .merlin opam
+
+install-bd: _oasis
+	@$(call check_prog,$(OPAM),"try your system package manager")
+	$(OPAM) install $(OASIS) $(OASIS2OPAM) $$(sed -ne 's/^# *BuildDepsOpam: *//p' "$<")
 
 setup.data: Makefile
 	$(MAKE) CONFIGUREFLAGS=--enable-tests configure
@@ -21,7 +26,8 @@ opam: _oasis
 	grep BuildDepends _oasis | cut -d: -f2 | tr ',' '\n' | sort -u | sed -re 's/\s*(.*)\s*/PKG \1/g' >> .merlin
 
 configure Makefile setup.ml: _oasis
-	for dep in oasis oasis2opam; do type $${dep} >/dev/null || $(OPAM) install $${dep}; done
+	@$(call check_prog,$(OASIS),"try the \`install-bd\` target")
+	@$(call check_prog,$(OASIS2OPAM),"try the \`install-bd\` target")
 	$(OASIS) -info setup -setup-update dynamic
 
 clean:
@@ -31,4 +37,4 @@ clean:
 
 reset: clean all
 
-.PHONY: all clean reset
+.PHONY: all clean install-bd reset

@@ -10,6 +10,7 @@ Authors:        Ximin Luo <infinity0@pwned.gg>
 License:        CC0
 Plugins:        META (0.4), DevFiles (0.4)
 BuildTools:     ocamlbuild
+#BuildDepsOpam: ounit core
 AlphaFeatures:  ocamlbuild_more_args
 Description:
   Example code for using different OCaml packaging tools.
