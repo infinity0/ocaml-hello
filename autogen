@@ -23,7 +23,7 @@ opam: _oasis
 .merlin: .merlin.in _oasis
 	$(OPAM) config subst .merlin
 	sed -e 's,^S\(\s*\)\(.*\),S\1\2\nB\1_build/\2,g' -i .merlin
-	grep BuildDepends _oasis | cut -d: -f2 | tr ',' '\n' | sort -u | sed -re 's/\s*(.*)\s*/PKG \1/g' >> .merlin
+	grep BuildDepends _oasis | cut -d: -f2 | tr ',' '\n' | sort -u | sed -re 's/\s*(\S\S*).*/PKG \1/g' >> .merlin
 
 configure Makefile setup.ml: _oasis
 	@$(call check_prog,$(OASIS),"try the \`install-bd\` target")
