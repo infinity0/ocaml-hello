@@ -1,5 +1,6 @@
-#!/usr/bin/make -f
+#!/bin/sh
 # Generate developer files. Requires opam and others.
+_= exec make -f "$0" "$@"
 
 OPAM = opam
 OASIS = oasis
