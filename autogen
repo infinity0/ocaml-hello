@@ -8,8 +8,28 @@ OASIS2OPAM = oasis2opam
 
 check_prog = type $(1) >/dev/null || { echo >&2 "not found: $(1); $(2)"; false; }
 
+.PHONY: all
 all: setup.data .merlin opam
 
+# TODO: assumes all dependencies use oasis; we should support others too
+get_ocamlfind_deps = bash -c "comm -13 \
+  <(sed -ne 's/\s*Library \"\?\(.*\)\"\?/\1/p' _oasis | sort -u) \
+  <(sed -ne '/^\s*BuildDepends\s*:/{s/^[^:]*:\s*//g;s/\s*,\s*/\n/gp;}' _oasis | sort -u)"
+get_opam_pkg = \
+  cd "$$HOME/.opam/$$(opam switch show)/build" && \
+  for lib in $${$(1)}; do grep -l "^\s*Library \"\?$$lib\"\?\s*$$" */_oasis | sed -e 's/\..*//'; done
+
+.PHONY: print-oc-bd
+print-oc-bd: _oasis
+	@echo $$($(get_ocamlfind_deps))
+
+.PHONY: update-bd-after-manual-install
+update-bd-after-manual-install: _oasis
+	ocdeps=$$($(get_ocamlfind_deps)); \
+	opdeps=$$($(call get_opam_pkg,ocdeps)); \
+	sed -e "s/BuildDepsOpam: .*/BuildDepsOpam: $$(echo $$opdeps)/" -i _oasis
+
+.PHONY: install-bd
 install-bd: _oasis
 	@$(call check_prog,$(OPAM),"try your system package manager")
 	$(OPAM) install $(OASIS) $(OASIS2OPAM) $$(sed -ne 's/^# *BuildDepsOpam: *//p' "$<")
@@ -31,11 +51,11 @@ configure Makefile setup.ml: _oasis
 	@$(call check_prog,$(OASIS2OPAM),"try the \`install-bd\` target")
 	$(OASIS) -info setup -setup-update dynamic
 
+.PHONY: clean
 clean:
 	-test -f Makefile && $(MAKE) distclean
 	$(OASIS) -info setup-clean -remove
 	rm -rf opam .merlin
 
+.PHONY: reset
 reset: clean all
-
-.PHONY: all clean install-bd reset
