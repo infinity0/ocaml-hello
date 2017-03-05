@@ -1,6 +1,8 @@
 #!/bin/sh
 # Generate developer files. Requires opam and others.
 _= exec make -f "$0" "$@"
+# Requires GNU sed, so on OS X you may wish to export SED=gsed
+SED?=sed
 
 OPAM = opam
 OASIS = oasis
@@ -13,8 +15,8 @@ all: setup.data .merlin opam
 
 # TODO: assumes all dependencies use oasis; we should support others too
 get_ocamlfind_deps = bash -c "comm -13 \
-  <(sed -ne 's/\s*Library \"\?\(.*\)\"\?/\1/p' _oasis | sort -u) \
-  <(sed -ne '/^\s*BuildDepends\s*:/{s/^[^:]*:\s*//g;s/\s*,\s*/\n/gp;}' _oasis | sort -u)"
+  <($(SED) -ne 's/\s*Library \"\?\(.*\)\"\?/\1/p' _oasis | sort -u) \
+  <($(SED) -ne '/^\s*BuildDepends\s*:/{s/^[^:]*:\s*//g;s/\s*,\s*/\n/gp;}' _oasis | sort -u)"
 get_opam_pkg = \
   cd "$$HOME/.opam/$$(opam switch show)/build" && \
   for lib in $${$(1)}; do grep -l "^\s*Library \"\?$$lib\"\?\s*$$" */_oasis | sed -e 's/\..*//'; done
@@ -27,12 +29,12 @@ print-oc-bd: _oasis
 update-bd-after-manual-install: _oasis
 	ocdeps=$$($(get_ocamlfind_deps)); \
 	opdeps=$$($(call get_opam_pkg,ocdeps)); \
-	sed -e "s/BuildDepsOpam: .*/BuildDepsOpam: $$(echo $$opdeps)/" -i _oasis
+	$(SED) -e "s/BuildDepsOpam: .*/BuildDepsOpam: $$(echo $$opdeps)/" -i _oasis
 
 .PHONY: install-bd
 install-bd: _oasis
 	@$(call check_prog,$(OPAM),"try your system package manager")
-	$(OPAM) install $(OASIS) $(OASIS2OPAM) $$(sed -ne 's/^# *BuildDepsOpam: *//p' "$<")
+	$(OPAM) install $(OASIS) $(OASIS2OPAM) $$($(SED) -ne 's/^# *BuildDepsOpam: *//p' "$<")
 
 setup.data: Makefile
 	$(MAKE) CONFIGUREFLAGS=--enable-tests configure
@@ -43,8 +45,8 @@ opam: _oasis
 # see https://github.com/the-lambda-church/merlin/issues/469
 .merlin: .merlin.in _oasis
 	$(OPAM) config subst .merlin
-	sed -e 's,^S\(\s*\)\(.*\),S\1\2\nB\1_build/\2,g' -i .merlin
-	grep BuildDepends _oasis | cut -d: -f2 | tr ',' '\n' | sort -u | sed -re 's/\s*(\S\S*).*/PKG \1/g' >> .merlin
+	$(SED) -e 's,^S\(\s*\)\(.*\),S\1\2\nB\1_build/\2,g' -i .merlin
+	grep BuildDepends _oasis | cut -d: -f2 | tr ',' '\n' | sort -u | $(SED) -re 's/\s*(\S\S*).*/PKG \1/g' >> .merlin
 
 configure Makefile setup.ml: _oasis
 	@$(call check_prog,$(OASIS),"try the \`install-bd\` target")
